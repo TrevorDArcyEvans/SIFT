@@ -1,4 +1,5 @@
-﻿using SIFT;
+﻿using GradientDotNet;
+using SIFT;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -16,9 +17,11 @@ static async Task SaveImageWithKeypoints(string path, Image<L8> img, IList<Keypo
             if (kp.Row - kp.Sigma < 0 || kp.Row + kp.Sigma >= img.Height || kp.Column - kp.Sigma < 0 ||
                 kp.Column + kp.Sigma >= img.Width) continue;
 
-            var circleDiameter = (float)kp.Sigma * 2;
+            var circleDiameter = kp.Sigma * 2;
             var circle = new EllipsePolygon(kp.Column, kp.Row, circleDiameter, circleDiameter);
             x.Draw(pen, circle);
+            x.DrawLines(Color.White, 1, new PointF(kp.Column, kp.Row),
+                new PointF(kp.Column + kp.Sigma * MathF.Cos(kp.PrincipalOrientation), kp.Row + kp.Sigma * MathF.Sin(kp.PrincipalOrientation)));
         }
     });
 
@@ -39,6 +42,20 @@ static float[] ImageSharpImageToArray(Image<L8> img)
     return greyPixels;
 }
 
+static async Task SaveAsMagnitudesImage(string path, IReadOnlyList<float> gradX, IReadOnlyList<float> gradY, int rows, int cols)
+{
+    var magImg = new Image<L8>(cols, rows);
+    for (var r = 0; r < rows; r++)
+    {
+        for (var c = 0; c < cols; c++)
+        {
+            magImg[c, r] = new L8((byte)Math.Sqrt(gradX[r * cols + c] * gradX[r * cols + c] +
+                                                  gradY[r * cols + c] * gradY[r * cols + c]));
+        }
+    }
+    await magImg.SaveAsJpegAsync(path);
+}
+
 // Download greyscale image to test with
 using var http = new HttpClient();
 http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0");
@@ -55,6 +72,16 @@ var greyImage = ImageSharpImageToArray(img);
 
 // Calculate DoG keypoints
 var keypoints = DifferenceOfGaussians.GetKeypoints(3, 5, greyImage, img.Height, img.Width);
+
+// Calculate image gradients
+var gradXImg = new float[img.Height * img.Width];
+var gradYImg = new float[img.Height * img.Width];
+Gradients.CentralDifference(greyImage, gradXImg, gradYImg, img.Height, img.Width);
+
+await SaveAsMagnitudesImage("gradient.jpg", gradXImg, gradYImg, img.Height, img.Width);
+
+// Calculate the principal orientation for each keypoint
+PrincipalOrientations.Update(keypoints, gradXImg, gradYImg, img.Height, img.Width);
 
 Console.WriteLine("Total keypoints: {0}", keypoints.Count);
 

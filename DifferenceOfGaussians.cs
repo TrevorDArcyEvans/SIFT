@@ -7,7 +7,7 @@ public static class DifferenceOfGaussians
         var blurRadii = new float[size];
         for (var i = 0; i < blurRadii.Length; i++)
         {
-            blurRadii[i] = sigmaInit * (float)Math.Pow(k, i);
+            blurRadii[i] = sigmaInit * MathF.Pow(k, i);
         }
 
         return blurRadii;
@@ -143,7 +143,7 @@ public static class DifferenceOfGaussians
     public static IList<Keypoint> GetKeypoints(int scales, int octaves, float[] img, int rows, int cols)
     {
         // Create the scale space
-        var blurRadii = CreateScaleSpace(scales, 1.4f, (float)Math.Sqrt(2));
+        var blurRadii = CreateScaleSpace(scales, 1.4f, MathF.Sqrt(2));
         
         // Calculate blurred images
         var (blurredImages, octaveScales) = GetBlurredImages(img, blurRadii, octaves, rows, cols);

@@ -8,5 +8,7 @@ public class Keypoint
 
     public float Magnitude { get; set; }
 
-    public double Sigma { get; init; }
+    public float Sigma { get; init; }
+
+    public float PrincipalOrientation { get; set; }
 }
