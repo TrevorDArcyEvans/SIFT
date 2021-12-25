@@ -55,12 +55,8 @@ public static class DifferenceOfGaussians
         return (blurredImages, scales);
     }
 
-    private static IList<Keypoint> CalculateKeypoints(float[][][] blurredImages, (int, int)[] octaveScales, float[] blurRadii)
+    private static float[][][] CalculateDifferenceImages(int octaves, float[][][] blurredImages, (int, int)[] octaveScales, float[] blurRadii)
     {
-        var octaves = octaveScales.Length;
-        var keypoints = new List<Keypoint>();
-
-        // Calculate difference images
         var differenceImages = new float[octaves][][];
         for (var o = 0; o < differenceImages.Length; o++)
         {
@@ -78,6 +74,13 @@ public static class DifferenceOfGaussians
                 }
             }
         }
+
+        return differenceImages;
+    }
+
+    private static IList<Keypoint> CalculateKeypoints(float[][][] differenceImages, (int, int)[] octaveScales, float[] blurRadii)
+    {
+        var keypoints = new List<Keypoint>();
 
         // Calculate keypoints at each octave by sliding a 3x3x3 window through the stack and finding local maxima
         for (var o = 0; o < differenceImages.Length; o++)
@@ -145,8 +148,11 @@ public static class DifferenceOfGaussians
         // Calculate blurred images
         var (blurredImages, octaveScales) = GetBlurredImages(img, blurRadii, octaves, rows, cols);
 
+        // Calculate difference images
+        var differenceImages = CalculateDifferenceImages(octaves, blurredImages, octaveScales, blurRadii);
+
         // Calculate difference images and keypoints at each scale
-        var keypoints = CalculateKeypoints(blurredImages, octaveScales, blurRadii);
+        var keypoints = CalculateKeypoints(differenceImages, octaveScales, blurRadii);
 
         if (keypoints.Any())
         {
