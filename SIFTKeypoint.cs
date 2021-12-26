@@ -32,7 +32,7 @@ public class SIFTKeypoint : Keypoint
         for (var i = 0; i < descriptors.Count; i++)
         {
             var score = CompareDescriptor(descriptors[i]);
-            if (score < 0.5f && score < bestScore)
+            if (score < 0.03f && score < bestScore)
             {
                 bestMatch = i;
                 bestScore = score;

@@ -23,6 +23,7 @@ public class SIFTImage : IDisposable
         // Match SIFT descriptors
         var descriptorMatches = Enumerable.Range(0, Keypoints.Count)
             .Select(i => new { Index = i, Match = Keypoints[i].GetClosestDescriptor(other.Descriptors), })
+            .Where(s => s.Match != -1)
             .ToDictionary(s => s.Index, s => s.Match);
 
         // Estimate affine transformation by voting
@@ -32,7 +33,7 @@ public class SIFTImage : IDisposable
 
         return new AffineTransformation
         {
-            Scale = transformationVotes
+            Scale = 1 / transformationVotes
                 .GroupBy(v => v.Scale)
                 .OrderByDescending(vs => vs.Count())
                 .Select(vs => vs.Key)

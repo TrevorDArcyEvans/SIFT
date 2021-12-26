@@ -43,6 +43,7 @@ img1.Mutate(x =>
 {
     x.Crop(new Rectangle(160, 0, 480, 480));
     x.Rotate(12);
+    x.Crop(new Rectangle(86, 86, 360, 360));
 });
 
 // Process SIFT images
