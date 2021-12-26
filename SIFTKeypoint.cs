@@ -14,7 +14,7 @@ public class SIFTKeypoint : Keypoint
         return MathF.Sqrt(Descriptor.Zip(other).Sum(dK => (dK.First - dK.Second) * (dK.First - dK.Second)));
     }
 
-    public int GetClosestDescriptor(IList<float[]> descriptors)
+    public int GetClosestDescriptor(IReadOnlyList<IReadOnlyList<float>> descriptors)
     {
         var bestMatch = -1;
         var bestScore = float.MaxValue;

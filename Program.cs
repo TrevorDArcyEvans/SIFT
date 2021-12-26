@@ -1,4 +1,5 @@
-﻿using SIFT;
+﻿using System.Text.RegularExpressions;
+using SIFT;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -32,19 +33,31 @@ using var http = new HttpClient();
 http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0");
 
 // Davidwkennedy, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
-await using var raw = await http.GetStreamAsync("https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg");
+await using var raw0 = await http.GetStreamAsync("https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg");
+var img0 = Image.Load<L8>(raw0);
+img0.Mutate(x => x.Crop(new Rectangle(0, 0, 480, 480)));
 
-// Process SIFT image
-var siftImage = SIFTImage.From(Image.Load<L8>(raw));
-await siftImage.Image.SaveAsJpegAsync("original.jpg");
+await using var raw1 = await http.GetStreamAsync("https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg");
+var img1 = Image.Load<L8>(raw1);
+img1.Mutate(x => x.Crop(new Rectangle(160, 0, 480, 480)));
 
-// Calculate SIFT descriptors
-foreach (var keypoint in siftImage.Keypoints)
+// Process SIFT images
+var siftImage0 = SIFTImage.From(img0);
+await siftImage0.Image.SaveAsJpegAsync("original_left.jpg");
+
+var siftImage1 = SIFTImage.From(img1);
+await siftImage1.Image.SaveAsJpegAsync("original_right.jpg");
+
+// Match SIFT descriptors
+var descriptorMatches = Enumerable.Range(0, siftImage0.Keypoints.Count)
+    .Select(i => new { Index = i, Match = siftImage0.Keypoints[i].GetClosestDescriptor(siftImage1.Descriptors), })
+    .ToDictionary(s => s.Index, s => s.Match);
+
+foreach (var (i, m) in descriptorMatches)
 {
-    Console.WriteLine(keypoint.Descriptor.Aggregate("[", (agg, next) => agg + " " + next) + "]");
+    Console.WriteLine($"{i}: {m}");
 }
 
-Console.WriteLine("Total keypoints: {0}", siftImage.Keypoints.Count);
-
-// Save the image with the final keypoint blobs
-await SaveImageWithKeypoints("keypoints.jpg", siftImage.Image, siftImage.Keypoints);
+// Save the images with the final keypoint blobs
+await SaveImageWithKeypoints("keypoints_left.jpg", siftImage0.Image, siftImage0.Keypoints);
+await SaveImageWithKeypoints("keypoints_right.jpg", siftImage1.Image, siftImage1.Keypoints);

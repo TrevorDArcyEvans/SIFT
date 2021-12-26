@@ -10,6 +10,8 @@ public class SIFTImage : IDisposable
 
     public IReadOnlyList<SIFTKeypoint> Keypoints { get; }
 
+    public IReadOnlyList<IReadOnlyList<float>> Descriptors => Keypoints.Select(kp => kp.Descriptor).ToList();
+
     private SIFTImage(Image<L8> img, IReadOnlyList<SIFTKeypoint> keypoints)
     {
         Image = img;
