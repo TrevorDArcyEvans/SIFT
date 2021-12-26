@@ -9,6 +9,17 @@ public class SIFTKeypoint : Keypoint
         Descriptor = Array.Empty<float>();
     }
 
+    public AffineTransformation GetTransformation(SIFTKeypoint other)
+    {
+        return new AffineTransformation
+        {
+            Scale = other.Sigma / Sigma,
+            TranslationX = other.Column - Column,
+            TranslationY = other.Row - Row,
+            Rotation = other.PrincipalOrientation - PrincipalOrientation,
+        };
+    }
+
     private float CompareDescriptor(IEnumerable<float> other)
     {
         return MathF.Sqrt(Descriptor.Zip(other).Sum(dK => (dK.First - dK.Second) * (dK.First - dK.Second)));
@@ -21,7 +32,7 @@ public class SIFTKeypoint : Keypoint
         for (var i = 0; i < descriptors.Count; i++)
         {
             var score = CompareDescriptor(descriptors[i]);
-            if (score < bestScore)
+            if (score < 0.5f && score < bestScore)
             {
                 bestMatch = i;
                 bestScore = score;

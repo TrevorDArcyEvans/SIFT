@@ -48,16 +48,55 @@ await siftImage0.Image.SaveAsJpegAsync("original_left.jpg");
 var siftImage1 = SIFTImage.From(img1);
 await siftImage1.Image.SaveAsJpegAsync("original_right.jpg");
 
+// Save the images with the keypoint blobs
+await SaveImageWithKeypoints("keypoints_left.jpg", siftImage0.Image, siftImage0.Keypoints);
+await SaveImageWithKeypoints("keypoints_right.jpg", siftImage1.Image, siftImage1.Keypoints);
+
 // Match SIFT descriptors
 var descriptorMatches = Enumerable.Range(0, siftImage0.Keypoints.Count)
     .Select(i => new { Index = i, Match = siftImage0.Keypoints[i].GetClosestDescriptor(siftImage1.Descriptors), })
     .ToDictionary(s => s.Index, s => s.Match);
 
-foreach (var (i, m) in descriptorMatches)
-{
-    Console.WriteLine($"{i}: {m}");
-}
+// Estimate affine transformation by voting
+var transformationVotes = descriptorMatches
+        .Select(kvp => siftImage0.Keypoints[kvp.Key].GetTransformation(siftImage1.Keypoints[kvp.Value]))
+        .ToList();
 
-// Save the images with the final keypoint blobs
-await SaveImageWithKeypoints("keypoints_left.jpg", siftImage0.Image, siftImage0.Keypoints);
-await SaveImageWithKeypoints("keypoints_right.jpg", siftImage1.Image, siftImage1.Keypoints);
+var transformation = new AffineTransformation
+{
+    Scale = transformationVotes
+        .GroupBy(v => v.Scale)
+        .OrderByDescending(vs => vs.Count())
+        .Select(vs => vs.Key)
+        .First(),
+    TranslationX = transformationVotes
+        .GroupBy(v => v.TranslationX)
+        .OrderByDescending(vs => vs.Count())
+        .Select(vs => vs.Key)
+        .First(),
+    TranslationY = transformationVotes
+        .GroupBy(v => v.TranslationY)
+        .OrderByDescending(vs => vs.Count())
+        .Select(vs => vs.Key)
+        .First(),
+    Rotation = transformationVotes
+        .GroupBy(v => v.Rotation)
+        .OrderByDescending(vs => vs.Count())
+        .Select(vs => vs.Key)
+        .First(),
+};
+
+Console.WriteLine("Estimated transformation:");
+Console.WriteLine($"\tScale: {transformation.Scale}");
+Console.WriteLine($"\tdX: {transformation.TranslationX}");
+Console.WriteLine($"\tdY: {transformation.TranslationY}");
+Console.WriteLine($"\tRotation: {transformation.Rotation * 180 / MathF.PI}*");
+
+// Correct affine transformation
+siftImage1.Image.Mutate(x =>
+{
+    x.Rotate(transformation.Rotation * 180 / MathF.PI);
+    x.Resize((int)(siftImage1.Image.Width * transformation.Scale), (int)(siftImage1.Image.Height * transformation.Scale));
+});
+
+await siftImage1.Image.SaveAsJpegAsync("corrected_right.jpg");
