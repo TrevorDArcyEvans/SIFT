@@ -1,8 +1,10 @@
-﻿namespace SIFT;
+﻿using System.Numerics;
+
+namespace SIFT;
 
 public class PrincipalOrientations
 {
-    private static float GetGradientOrientation(float gradX, float gradY)
+    public static float GetGradientOrientation(float gradX, float gradY)
     {
         return MathF.Atan(gradY / gradX);
     }
@@ -44,6 +46,7 @@ public class PrincipalOrientations
 
                     gradXAvg /= cWidth;
                     gradYAvg /= rWidth;
+                    keypoint.SetGradient(r, c, (gradXAvg, gradYAvg));
                     if (gradXAvg == 0) continue;
 
                     var orientation = GetGradientOrientation(gradXAvg, gradYAvg);
@@ -82,14 +85,18 @@ public class PrincipalOrientations
             // Add more keypoints if there are multiple equal buckets
             for (var b = 1; b < maxBuckets.Count; b++)
             {
-                extraKeypoints.Add(new Keypoint
+                var newKeypoint = new Keypoint
                 {
                     Row = keypoint.Row,
                     Column = keypoint.Column,
                     Magnitude = keypoint.Magnitude,
                     Sigma = keypoint.Sigma,
                     PrincipalOrientation = maxBuckets[b] * bucketWidth,
-                });
+                };
+
+                newKeypoint.CopyGradientsFrom(keypoint);
+
+                extraKeypoints.Add(newKeypoint);
             }
         }
 

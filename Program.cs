@@ -56,6 +56,11 @@ static async Task SaveAsMagnitudesImage(string path, IReadOnlyList<float> gradX,
     await magImg.SaveAsJpegAsync(path);
 }
 
+static float CompareSIFTDescriptors(IEnumerable<float> d0, IEnumerable<float> d1)
+{
+    return MathF.Sqrt(d0.Zip(d1).Sum(dK => (dK.First - dK.Second) * (dK.First - dK.Second)));
+}
+
 // Download greyscale image to test with
 using var http = new HttpClient();
 http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0");
@@ -82,6 +87,13 @@ await SaveAsMagnitudesImage("gradient.jpg", gradXImg, gradYImg, img.Height, img.
 
 // Calculate the principal orientation for each keypoint
 PrincipalOrientations.Update(keypoints, gradXImg, gradYImg, img.Height, img.Width);
+
+// Calculate SIFT descriptors
+foreach (var keypoint in keypoints)
+{
+    var descriptor = keypoint.ToSIFTDescriptor();
+    Console.WriteLine(descriptor.Aggregate("[", (agg, next) => agg + " " + next) + "]");
+}
 
 Console.WriteLine("Total keypoints: {0}", keypoints.Count);
 
