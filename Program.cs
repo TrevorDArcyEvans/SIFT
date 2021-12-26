@@ -39,7 +39,11 @@ img0.Mutate(x => x.Crop(new Rectangle(0, 0, 480, 480)));
 
 await using var raw1 = await http.GetStreamAsync("https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg");
 var img1 = Image.Load<L8>(raw1);
-img1.Mutate(x => x.Crop(new Rectangle(160, 0, 480, 480)));
+img1.Mutate(x =>
+{
+    x.Crop(new Rectangle(160, 0, 480, 480));
+    x.Rotate(12);
+});
 
 // Process SIFT images
 var siftImage0 = SIFTImage.From(img0);

@@ -36,7 +36,7 @@ public static class DifferenceOfGaussians
 
                 if (j == blurredImages[i].Length / 2)
                 {
-                    nextGrey = new float[(thisRows / 2) * (thisCols / 2)];
+                    nextGrey = new float[(int)MathF.Ceiling(thisRows / 2f) * (int)MathF.Ceiling(thisCols / 2f)];
                     for (var r = 0; r < thisRows; r += 2)
                     {
                         for (var c = 0; c < thisCols; c += 2)
@@ -47,8 +47,8 @@ public static class DifferenceOfGaussians
                 }
             }
 
-            thisRows /= 2;
-            thisCols /= 2;
+            thisRows = (int)MathF.Ceiling(thisRows / 2f);
+            thisCols = (int)MathF.Ceiling(thisCols / 2f);
             thisGrey = nextGrey;
         }
 
