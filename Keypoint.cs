@@ -19,7 +19,7 @@ public class Keypoint
         _gradientLocalNeighborhood = new float[128];
     }
 
-    public float[] ToSIFTDescriptor()
+    public SIFTKeypoint ToSIFTKeypoint()
     {
         var descriptor = new float[128];
         var bucketWidth = 2 * MathF.PI / 8;
@@ -69,7 +69,15 @@ public class Keypoint
             descriptor[i] /= magnitude;
         }
 
-        return descriptor;
+        return new SIFTKeypoint
+        {
+            Row = Row,
+            Column = Column,
+            Magnitude = Magnitude,
+            Sigma = Sigma,
+            PrincipalOrientation = PrincipalOrientation,
+            Descriptor = descriptor,
+        };
     }
 
     public (float, float) GetGradient(int r, int c)
