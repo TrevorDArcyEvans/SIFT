@@ -4,13 +4,22 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace SIFT;
 
-public class SIFTImage
+public class SIFTImage : IDisposable
 {
-    public IReadOnlyList<SIFTKeypoint> Keypoints { get; private init; }
+    public Image<L8> Image { get; }
 
-    private SIFTImage()
+    public IReadOnlyList<SIFTKeypoint> Keypoints { get; }
+
+    private SIFTImage(Image<L8> img, IReadOnlyList<SIFTKeypoint> keypoints)
     {
-        Keypoints = Array.Empty<SIFTKeypoint>();
+        Image = img;
+        Keypoints = keypoints;
+    }
+
+    public void Dispose()
+    {
+        Image.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private static float[] ImageSharpImageToArray(Image<L8> img)
@@ -43,9 +52,6 @@ public class SIFTImage
         // Calculate the principal orientation for each keypoint
         PrincipalOrientations.Update(keypoints, gradXImg, gradYImg, img.Height, img.Width);
 
-        return new SIFTImage
-        {
-            Keypoints = keypoints.Select(s => s.ToSIFTKeypoint()).ToList(),
-        };
+        return new SIFTImage(img, keypoints.Select(s => s.ToSIFTKeypoint()).ToList());
     }
 }

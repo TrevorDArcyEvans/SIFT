@@ -34,12 +34,9 @@ http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win
 // Davidwkennedy, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
 await using var raw = await http.GetStreamAsync("https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg");
 
-using var img = Image.Load<L8>(raw);
-
-await img.SaveAsJpegAsync("original.jpg");
-
 // Process SIFT image
-var siftImage = SIFTImage.From(img);
+var siftImage = SIFTImage.From(Image.Load<L8>(raw));
+await siftImage.Image.SaveAsJpegAsync("original.jpg");
 
 // Calculate SIFT descriptors
 foreach (var keypoint in siftImage.Keypoints)
@@ -50,4 +47,4 @@ foreach (var keypoint in siftImage.Keypoints)
 Console.WriteLine("Total keypoints: {0}", siftImage.Keypoints.Count);
 
 // Save the image with the final keypoint blobs
-await SaveImageWithKeypoints("keypoints.jpg", img, siftImage.Keypoints);
+await SaveImageWithKeypoints("keypoints.jpg", siftImage.Image, siftImage.Keypoints);
