@@ -69,3 +69,13 @@ siftImage1.Image.Mutate(x =>
 });
 
 await siftImage1.Image.SaveAsJpegAsync("corrected_right.jpg");
+
+// Merge aligned images
+using var outImage = new Image<L8>((int)(siftImage0.Image.Width - transformation.TranslationX), (int)(siftImage0.Image.Height - transformation.TranslationY));
+outImage.Mutate(x =>
+{
+    x.DrawImage(siftImage0.Image, new Point(0, 0), 1.0f);
+    x.DrawImage(siftImage1.Image, new Point(-(int)transformation.TranslationX, -(int)transformation.TranslationY), 1.0f);
+});
+
+await outImage.SaveAsJpegAsync("corrected.jpg");
