@@ -18,6 +18,43 @@ public class SIFTImage : IDisposable
         Keypoints = keypoints;
     }
 
+    public AffineTransformation MatchWith(SIFTImage other)
+    {
+        // Match SIFT descriptors
+        var descriptorMatches = Enumerable.Range(0, Keypoints.Count)
+            .Select(i => new { Index = i, Match = Keypoints[i].GetClosestDescriptor(other.Descriptors), })
+            .ToDictionary(s => s.Index, s => s.Match);
+
+        // Estimate affine transformation by voting
+        var transformationVotes = descriptorMatches
+            .Select(kvp => Keypoints[kvp.Key].GetTransformation(other.Keypoints[kvp.Value]))
+            .ToList();
+
+        return new AffineTransformation
+        {
+            Scale = transformationVotes
+                .GroupBy(v => v.Scale)
+                .OrderByDescending(vs => vs.Count())
+                .Select(vs => vs.Key)
+                .First(),
+            TranslationX = transformationVotes
+                .GroupBy(v => v.TranslationX)
+                .OrderByDescending(vs => vs.Count())
+                .Select(vs => vs.Key)
+                .First(),
+            TranslationY = transformationVotes
+                .GroupBy(v => v.TranslationY)
+                .OrderByDescending(vs => vs.Count())
+                .Select(vs => vs.Key)
+                .First(),
+            Rotation = transformationVotes
+                .GroupBy(v => v.Rotation)
+                .OrderByDescending(vs => vs.Count())
+                .Select(vs => vs.Key)
+                .First(),
+        };
+    }
+
     public void Dispose()
     {
         Image.Dispose();

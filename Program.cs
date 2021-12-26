@@ -52,39 +52,8 @@ await siftImage1.Image.SaveAsJpegAsync("original_right.jpg");
 await SaveImageWithKeypoints("keypoints_left.jpg", siftImage0.Image, siftImage0.Keypoints);
 await SaveImageWithKeypoints("keypoints_right.jpg", siftImage1.Image, siftImage1.Keypoints);
 
-// Match SIFT descriptors
-var descriptorMatches = Enumerable.Range(0, siftImage0.Keypoints.Count)
-    .Select(i => new { Index = i, Match = siftImage0.Keypoints[i].GetClosestDescriptor(siftImage1.Descriptors), })
-    .ToDictionary(s => s.Index, s => s.Match);
-
-// Estimate affine transformation by voting
-var transformationVotes = descriptorMatches
-        .Select(kvp => siftImage0.Keypoints[kvp.Key].GetTransformation(siftImage1.Keypoints[kvp.Value]))
-        .ToList();
-
-var transformation = new AffineTransformation
-{
-    Scale = transformationVotes
-        .GroupBy(v => v.Scale)
-        .OrderByDescending(vs => vs.Count())
-        .Select(vs => vs.Key)
-        .First(),
-    TranslationX = transformationVotes
-        .GroupBy(v => v.TranslationX)
-        .OrderByDescending(vs => vs.Count())
-        .Select(vs => vs.Key)
-        .First(),
-    TranslationY = transformationVotes
-        .GroupBy(v => v.TranslationY)
-        .OrderByDescending(vs => vs.Count())
-        .Select(vs => vs.Key)
-        .First(),
-    Rotation = transformationVotes
-        .GroupBy(v => v.Rotation)
-        .OrderByDescending(vs => vs.Count())
-        .Select(vs => vs.Key)
-        .First(),
-};
+// Estimate affine transformation
+var transformation = siftImage0.MatchWith(siftImage1);
 
 Console.WriteLine("Estimated transformation:");
 Console.WriteLine($"\tScale: {transformation.Scale}");
