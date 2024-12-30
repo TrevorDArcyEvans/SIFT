@@ -46,7 +46,10 @@ git clone --recurse-submodules https://github.com/TrevorDArcyEvans/SIFT.git
 cd SIFT
 dotnet restore
 dotnet build
+cd SIFT.Demo
 dotnet run
+
+# examine contents of current directory
 ```
 
 
