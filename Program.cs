@@ -5,27 +5,29 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using Path = SixLabors.ImageSharp.Drawing.Path;
 
 static async Task SaveImageWithKeypoints(string path, Image<L8> img, IEnumerable<Keypoint> keypoints)
 {
-    var pen = Pens.Solid(Color.White, 1);
+  var pen = Pens.Solid(Color.White, 1);
 
-    img.Mutate(x =>
+  img.Mutate(x =>
+  {
+    foreach (var kp in keypoints)
     {
-        foreach (var kp in keypoints)
-        {
-            if (kp.Row - kp.Sigma < 0 || kp.Row + kp.Sigma >= img.Height || kp.Column - kp.Sigma < 0 ||
-                kp.Column + kp.Sigma >= img.Width) continue;
+      if (kp.Row - kp.Sigma < 0 || kp.Row + kp.Sigma >= img.Height || kp.Column - kp.Sigma < 0 ||
+          kp.Column + kp.Sigma >= img.Width) continue;
 
-            var circleDiameter = kp.Sigma * 2;
-            var circle = new EllipsePolygon(kp.Column, kp.Row, circleDiameter, circleDiameter);
-            x.Draw(pen, circle);
-            x.DrawLines(Color.White, 1, new PointF(kp.Column, kp.Row),
-                new PointF(kp.Column + kp.Sigma * MathF.Cos(kp.PrincipalOrientation), kp.Row + kp.Sigma * MathF.Sin(kp.PrincipalOrientation)));
-        }
-    });
+      var circleDiameter = kp.Sigma * 2;
+      var circle = new EllipsePolygon(kp.Column, kp.Row, circleDiameter, circleDiameter);
+      x.Draw(pen, circle);
+      x.Draw(pen,
+        new Path(new LinearLineSegment(new PointF(kp.Column, kp.Row),
+        new PointF(kp.Column + kp.Sigma * MathF.Cos(kp.PrincipalOrientation), kp.Row + kp.Sigma * MathF.Sin(kp.PrincipalOrientation)))));
+    }
+  });
 
-    await img.SaveAsJpegAsync(path);
+  await img.SaveAsJpegAsync(path);
 }
 
 // Download greyscale image to test with
@@ -41,9 +43,9 @@ await using var raw1 = await http.GetStreamAsync("https://upload.wikimedia.org/w
 var img1 = Image.Load<L8>(raw1);
 img1.Mutate(x =>
 {
-    x.Crop(new Rectangle(160, 0, 480, 480));
-    x.Rotate(12);
-    x.Crop(new Rectangle(86, 86, 360, 360));
+  x.Crop(new Rectangle(160, 0, 480, 480));
+  x.Rotate(12);
+  x.Crop(new Rectangle(86, 86, 360, 360));
 });
 
 // Process SIFT images
@@ -69,8 +71,8 @@ Console.WriteLine($"\tRotation: {transformation.Rotation * 180 / MathF.PI}*");
 // Correct affine transformation
 siftImage1.Image.Mutate(x =>
 {
-    x.Rotate(transformation.Rotation * 180 / MathF.PI);
-    x.Resize((int)(siftImage1.Image.Width * transformation.Scale), (int)(siftImage1.Image.Height * transformation.Scale));
+  x.Rotate(transformation.Rotation * 180 / MathF.PI);
+  x.Resize((int)(siftImage1.Image.Width * transformation.Scale), (int)(siftImage1.Image.Height * transformation.Scale));
 });
 
 await siftImage1.Image.SaveAsJpegAsync("corrected_right.jpg");
@@ -79,8 +81,8 @@ await siftImage1.Image.SaveAsJpegAsync("corrected_right.jpg");
 using var outImage = new Image<L8>((int)(siftImage0.Image.Width - transformation.TranslationX), (int)(siftImage0.Image.Height - transformation.TranslationY));
 outImage.Mutate(x =>
 {
-    x.DrawImage(siftImage0.Image, new Point(0, 0), 1.0f);
-    x.DrawImage(siftImage1.Image, new Point(-(int)transformation.TranslationX, -(int)transformation.TranslationY), 1.0f);
+  x.DrawImage(siftImage0.Image, new Point(0, 0), 1.0f);
+  x.DrawImage(siftImage1.Image, new Point(-(int)transformation.TranslationX, -(int)transformation.TranslationY), 1.0f);
 });
 
 await outImage.SaveAsJpegAsync("corrected.jpg");
