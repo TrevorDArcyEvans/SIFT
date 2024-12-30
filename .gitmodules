@@ -1,0 +1,3 @@
+[submodule "GradientDotNet"]
+	path = GradientDotNet
+	url = https://github.com/karashiiro/GradientDotNet

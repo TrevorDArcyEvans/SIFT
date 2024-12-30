@@ -26,7 +26,7 @@ Based on code from:<br/>
 ## Getting started
 
 ```bash
-git clone https://github.com/TrevorDArcyEvans/SIFT.git
+git clone --recurse-submodules https://github.com/TrevorDArcyEvans/SIFT.git
 cd SIFT
 dotnet restore
 dotnet build
