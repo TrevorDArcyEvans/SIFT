@@ -1,8 +1,8 @@
-﻿using GradientDotNet;
+﻿namespace SIFT;
+
+using GradientDotNet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-
-namespace SIFT;
 
 public class SIFTImage : IDisposable
 {

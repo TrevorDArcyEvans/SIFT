@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace SIFT;
+﻿namespace SIFT;
 
 public class PrincipalOrientations
 {

@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using SIFT;
+﻿using SIFT;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
