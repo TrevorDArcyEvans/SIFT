@@ -23,23 +23,22 @@ static async Task SaveImageWithKeypoints(string path, Image<L8> img, IEnumerable
       x.Draw(pen, circle);
       x.Draw(pen,
         new Path(new LinearLineSegment(new PointF(kp.Column, kp.Row),
-        new PointF(kp.Column + kp.Sigma * MathF.Cos(kp.PrincipalOrientation), kp.Row + kp.Sigma * MathF.Sin(kp.PrincipalOrientation)))));
+          new PointF(kp.Column + kp.Sigma * MathF.Cos(kp.PrincipalOrientation), kp.Row + kp.Sigma * MathF.Sin(kp.PrincipalOrientation)))));
     }
   });
 
   await img.SaveAsJpegAsync(path);
 }
 
-// Download greyscale image to test with
-using var http = new HttpClient();
-http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0");
-
+// Load greyscale image to test with
 // Davidwkennedy, CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons
-await using var raw0 = await http.GetStreamAsync("https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg");
+//    https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg
+
+await using var raw0 = File.OpenRead("Bikesgray.jpg");
 var img0 = Image.Load<L8>(raw0);
 img0.Mutate(x => x.Crop(new Rectangle(0, 0, 480, 480)));
 
-await using var raw1 = await http.GetStreamAsync("https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg");
+await using var raw1 = File.OpenRead("Bikesgray.jpg");
 var img1 = Image.Load<L8>(raw1);
 img1.Mutate(x =>
 {
