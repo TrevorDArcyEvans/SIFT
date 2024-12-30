@@ -2,7 +2,7 @@
 
 Find local features using [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform)
 
-![baseline](SIFT/Bikesgray.jpg)
+![baseline](SIFT.Demo/Bikesgray.jpg)
 
 ![left](assets/original_left.jpg)
 ![right](assets/original_right.jpg)
