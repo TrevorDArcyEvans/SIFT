@@ -24,18 +24,21 @@ public class PrincipalOrientations
           var gradXAvg = 0f;
           var gradYAvg = 0f;
 
-          var rScaledStart = (int)Math.Truncate(keypoint.Row + (r - 4) * keypoint.Sigma);
-          var rScaledEnd = (int)Math.Truncate(keypoint.Row + (r - 3) * keypoint.Sigma);
+          var rScaledStart = (int) Math.Truncate(keypoint.Row + (r - 4) * keypoint.Sigma);
+          var rScaledEnd = (int) Math.Truncate(keypoint.Row + (r - 3) * keypoint.Sigma);
           var rWidth = rScaledEnd - rScaledStart + 1;
-          var cScaledStart = (int)Math.Truncate(keypoint.Column + (c - 4) * keypoint.Sigma);
-          var cScaledEnd = (int)Math.Truncate(keypoint.Column + (c - 3) * keypoint.Sigma);
+          var cScaledStart = (int) Math.Truncate(keypoint.Column + (c - 4) * keypoint.Sigma);
+          var cScaledEnd = (int) Math.Truncate(keypoint.Column + (c - 3) * keypoint.Sigma);
           var cWidth = cScaledEnd - cScaledStart + 1;
 
           for (var rScaled = rScaledStart; rScaled <= rScaledEnd; rScaled++)
           {
             for (var cScaled = cScaledStart; cScaled <= cScaledEnd; cScaled++)
             {
-              if (rScaled < 0 || rScaled >= rows || cScaled < 0 || cScaled >= cols) continue;
+              if (rScaled < 0 || rScaled >= rows || cScaled < 0 || cScaled >= cols)
+              {
+                continue;
+              }
 
               gradXAvg += gradXImg[rScaled * cols + cScaled];
               gradYAvg += gradYImg[rScaled * cols + cScaled];
@@ -57,7 +60,7 @@ public class PrincipalOrientations
             orientation += 2 * MathF.PI;
           }
 
-          orientationBuckets[(int)Math.Floor(orientation / bucketWidth)]++;
+          orientationBuckets[(int) Math.Floor(orientation / bucketWidth)]++;
         }
       }
 
@@ -69,7 +72,7 @@ public class PrincipalOrientations
         if (orientationBuckets[o] > maxValue)
         {
           maxValue = orientationBuckets[o];
-          maxBuckets = new List<int> { o };
+          maxBuckets = new List<int> {o};
         }
         else if (orientationBuckets[o] == maxValue)
         {
