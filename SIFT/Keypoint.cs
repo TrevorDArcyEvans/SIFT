@@ -38,12 +38,22 @@ public class Keypoint
         {
           var nextR = r;
           var nextC = c;
-          if (quadrant is 1 or 3) nextR += 4;
-          if (quadrant is 2 or 3) nextC += 4;
+          if (quadrant is 1 or 3)
+          {
+            nextR += 4;
+          }
+
+          if (quadrant is 2 or 3)
+          {
+            nextC += 4;
+          }
 
           var gradX = gradientsXGaussian[nextR * 8 + nextC];
           var gradY = gradientsYGaussian[nextR * 8 + nextC];
-          if (gradX == 0) continue;
+          if (gradX == 0)
+          {
+            continue;
+          }
 
           var orientation = PrincipalOrientations.GetGradientOrientation(gradX, gradY);
           orientation %= 2 * MathF.PI;
@@ -78,7 +88,7 @@ public class Keypoint
     };
   }
 
-  public (float, float) GetGradient(int r, int c)
+  private (float, float) GetGradient(int r, int c)
   {
     return (_gradientLocalNeighborhood[r * 8 + c], _gradientLocalNeighborhood[r * 8 + c + 64]);
   }
