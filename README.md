@@ -2,26 +2,42 @@
 
 Find local features using [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform)
 
-![baseline](SIFT.Demo/Bikesgray.jpg)
+![baseline](SIFT.Demo/Bikesgray.jpg)<br/>
+  Baseline = image from https://upload.wikimedia.org/wikipedia/commons/3/3f/Bikesgray.jpg
+<br/>
 
-![left](assets/original_left.jpg)
-![right](assets/original_right.jpg)
+![left](assets/original_left.jpg)<br/>
+  Left = Baseline + cropped
+<br/>
 
-![keypoints left](assets/keypoints_left.jpg)
-![keypoints right](assets/keypoints_right.jpg)
+![right](assets/original_right.jpg)<br/>
+  Right = Baseline cropped + rotated
+<br/>
 
-![corrected](assets/corrected.jpg)
-![corrected right](assets/corrected_right.jpg)
+![keypoints left](assets/keypoints_left.jpg)<br/>
+  Keypoints Left
+<br/>
+
+![keypoints right](assets/keypoints_right.jpg)<br/>
+  Keypoints Right
+<br/>
+
+![corrected right](assets/corrected_right.jpg)<br/>
+  Corrected Right = Keypoints Right + rotated + scaled
+<br/>
+
+![corrected](assets/corrected.jpg)<br/>
+Corrected = Corrected Right + merged + Keypoints Left
+<br/>
 
 Based on code from:<br/>
-  * https://github.com/karashiiro/SIFT
-  * https://github.com/karashiiro/GradientDotNet
 
+* https://github.com/karashiiro/SIFT
+* https://github.com/karashiiro/GradientDotNet
 
 ## Prerequisites
 
 * .NET9 SDK
-
 
 ## Getting started
 
