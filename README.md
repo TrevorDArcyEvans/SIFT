@@ -2,7 +2,7 @@
 
 Find local features using [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform)
 
-![baseline](Bikesgray.jpg)
+![baseline](SIFT/Bikesgray.jpg)
 
 ![left](assets/original_left.jpg)
 ![right](assets/original_right.jpg)
@@ -26,7 +26,7 @@ Based on code from:<br/>
 ## Getting started
 
 ```bash
-git clone https://github.com/TrevorDArcyEvans/SIFT.git
+git clone --recurse-submodules https://github.com/TrevorDArcyEvans/SIFT.git
 cd SIFT
 dotnet restore
 dotnet build
