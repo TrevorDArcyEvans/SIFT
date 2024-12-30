@@ -12,12 +12,7 @@ public class Keypoint
 
     public float PrincipalOrientation { get; set; }
 
-    private readonly float[] _gradientLocalNeighborhood;
-
-    public Keypoint()
-    {
-        _gradientLocalNeighborhood = new float[128];
-    }
+    private readonly float[] _gradientLocalNeighborhood = new float[128];
 
     public SIFTKeypoint ToSIFTKeypoint()
     {

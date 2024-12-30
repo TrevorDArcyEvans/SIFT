@@ -2,12 +2,7 @@
 
 public class SIFTKeypoint : Keypoint
 {
-    public IReadOnlyList<float> Descriptor { get; init; }
-
-    public SIFTKeypoint()
-    {
-        Descriptor = Array.Empty<float>();
-    }
+    public IReadOnlyList<float> Descriptor { get; init; } = Array.Empty<float>();
 
     public AffineTransformation GetTransformation(SIFTKeypoint other)
     {
