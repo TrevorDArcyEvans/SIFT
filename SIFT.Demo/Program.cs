@@ -14,8 +14,13 @@ static async Task SaveImageWithKeypoints(string path, Image<L8> img, IEnumerable
   {
     foreach (var kp in keypoints)
     {
-      if (kp.Row - kp.Sigma < 0 || kp.Row + kp.Sigma >= img.Height || kp.Column - kp.Sigma < 0 ||
-          kp.Column + kp.Sigma >= img.Width) continue;
+      if (kp.Row - kp.Sigma < 0 ||
+          kp.Row + kp.Sigma >= img.Height ||
+          kp.Column - kp.Sigma < 0 ||
+          kp.Column + kp.Sigma >= img.Width)
+      {
+        continue;
+      }
 
       var circleDiameter = kp.Sigma * 2;
       var circle = new EllipsePolygon(kp.Column, kp.Row, circleDiameter, circleDiameter);
@@ -70,17 +75,17 @@ Console.WriteLine($"\tRotation: {transformation.Rotation * 180 / MathF.PI}*");
 siftImage1.Image.Mutate(x =>
 {
   x.Rotate(transformation.Rotation * 180 / MathF.PI);
-  x.Resize((int)(siftImage1.Image.Width * transformation.Scale), (int)(siftImage1.Image.Height * transformation.Scale));
+  x.Resize((int) (siftImage1.Image.Width * transformation.Scale), (int) (siftImage1.Image.Height * transformation.Scale));
 });
 
 await siftImage1.Image.SaveAsJpegAsync("corrected_right.jpg");
 
 // Merge aligned images
-using var outImage = new Image<L8>((int)(siftImage0.Image.Width - transformation.TranslationX), (int)(siftImage0.Image.Height - transformation.TranslationY));
+using var outImage = new Image<L8>((int) (siftImage0.Image.Width - transformation.TranslationX), (int) (siftImage0.Image.Height - transformation.TranslationY));
 outImage.Mutate(x =>
 {
   x.DrawImage(siftImage0.Image, new Point(0, 0), 1.0f);
-  x.DrawImage(siftImage1.Image, new Point(-(int)transformation.TranslationX, -(int)transformation.TranslationY), 1.0f);
+  x.DrawImage(siftImage1.Image, new Point(-(int) transformation.TranslationX, -(int) transformation.TranslationY), 1.0f);
 });
 
 await outImage.SaveAsJpegAsync("corrected.jpg");
