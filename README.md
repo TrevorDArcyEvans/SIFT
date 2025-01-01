@@ -52,4 +52,7 @@ dotnet run
 # examine contents of current directory
 ```
 
+## Using SIFT to recognise features
 
+![](assets/baseline-phone_cam_15-vs-phone_cam_16.png)
+![](assets/comparison-phone_cam_15-vs-phone_cam_16.jpg)
